@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: seed-data
+spec:
+  selector:
+    app: seed-data
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seed-data
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seed-data
+  template:
+    metadata:
+      labels:
+        app: seed-data
+    spec:
+      containers:
+        - name: seed-data
+          image: esiea-ressources-seed-data
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+---
